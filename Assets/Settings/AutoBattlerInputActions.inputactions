@@ -1,0 +1,54 @@
+{
+    "name": "MobaInputActions",
+    "maps": [
+        {
+            "name": "GameplayMap",
+            "id": "6c89a843-506b-4e9f-9318-7ec0c1fdb8e5",
+            "actions": [
+                {
+                    "name": "Q",
+                    "type": "Button",
+                    "id": "34eba5d6-7a82-428e-9bc2-b610923d2085",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftMouseButton",
+                    "type": "Button",
+                    "id": "9235f2aa-029b-46a9-b190-d0af96b298c5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "f6e5d6b2-6329-4b54-aefd-3b441ce0747a",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Q",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9b2f62f0-0510-4184-a354-9486f6a68a69",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftMouseButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
