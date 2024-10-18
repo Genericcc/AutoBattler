@@ -13,14 +13,15 @@
 //         
 //         public void OnUpdate(ref SystemState state)
 //         {
-//             state.Enabled = false;
-//             
 //             var battleGridEntity = SystemAPI.GetSingletonEntity<BattleGridTag>();
 //             var grinNodes = SystemAPI.GetBuffer<GridNode>(battleGridEntity);
 //
 //             foreach (var gridNode in grinNodes)
 //             {
-//                 Debug.Log($"{gridNode.X}, {gridNode.Y}, i: {gridNode.Index}");
+//                 if (gridNode.IsFree)
+//                 {
+//                     Debug.Log($"{gridNode.X}, {gridNode.Y}, i: {gridNode.Index}");
+//                 }
 //             }
 //         }
 //     }
