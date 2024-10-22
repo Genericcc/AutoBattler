@@ -15,7 +15,12 @@ namespace DOTS.Battle
             foreach (var (transform, target, moveSpeed) 
                      in SystemAPI.Query<RefRW<LocalTransform>, TargetEntity, MoveSpeed>())
             {
-                var currentTargetPosition = target.TargetTransform.Position;
+                if (target.Target == Entity.Null)
+                {
+                    continue;
+                }
+                
+                var currentTargetPosition = SystemAPI.GetComponent<LocalTransform>(target.Target).Position;
                 if (math.distance(currentTargetPosition, transform.ValueRO.Position) <= 1.5f)
                 {
                     continue;

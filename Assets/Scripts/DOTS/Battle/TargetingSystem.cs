@@ -1,6 +1,7 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
@@ -48,20 +49,21 @@ namespace DOTS.Battle
             private void Execute(Entity searchingEntity, ref TargetEntity targetEntity,
                 in LocalTransform transform, in TargetingRadius searchRadius)
             {
+                if (targetEntity.Target != Entity.Null)
+                {
+                    return;
+                }
+                
                 var hits = new NativeList<DistanceHit>(Allocator.TempJob);
                 if (CollisionWorld.OverlapSphere(transform.Position, searchRadius.Value, ref hits, CollisionFilter))
                 {
                     var closestDistance = float.MaxValue;
                     var closestEntity = Entity.Null;
-                    
-                    Debug.Log("Did overlap spehere");
 
                     foreach (var hit in hits)
                     {
                         if (!TeamLookup.TryGetComponent(hit.Entity, out var team)) { continue; }
                         if (TeamLookup[searchingEntity].Value == team.Value) { continue; }
-                        
-                        Debug.Log("Did find other team");
 
                         if (hit.Distance < closestDistance)
                         {
@@ -74,8 +76,6 @@ namespace DOTS.Battle
                 }
                 else
                 {
-                    Debug.Log("No overlap spehere, target null");
-                    
                     targetEntity.Target = Entity.Null;
                 }
                 

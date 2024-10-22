@@ -61,7 +61,6 @@ namespace DOTS.Battle
     public struct TargetEntity : IComponentData
     {
         public Entity Target;
-        public LocalTransform TargetTransform;
     }
     
     public struct NpcAttackProperties : IComponentData
