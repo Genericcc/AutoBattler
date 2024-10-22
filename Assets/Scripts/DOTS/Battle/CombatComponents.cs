@@ -18,17 +18,9 @@ namespace DOTS.Battle
         public int Value;
     }
 
-    // [GhostComponent(PrefabType = GhostPrefabType.AllPredicted, OwnerSendType = SendToOwnerType.SendToNonOwner)]
-    // public struct DamageThisTick : ICommandData
-    // {
-    //     public NetworkTick Tick { get; set; }
-    //     public int Value;
-    // }
-
-    public struct AbilityPrefabs : IComponentData
+    public struct AttackPrefabs : IComponentData
     {
-        public Entity AoeAbility;
-        public Entity SkillShotAbility;
+        public Entity BaseAttackPrefab;
     }
 
     public struct DestroyOnTimer : IComponentData
@@ -42,32 +34,37 @@ namespace DOTS.Battle
     {
         public int Value;
     }
-    
-    public struct AlreadyDamagedEntity : IBufferElementData
-    {
-        public Entity Value;
-    }
 
-    public struct AbilityMoveSpeed : IComponentData
+    public struct ProjectileSpeed : IComponentData
     {
         public float Value;
     }
 
-    public struct TargetingRadius : IComponentData
+    public struct EntityTargetingRadius : IComponentData
+    {
+        public float Value;
+    }
+
+    public struct AttackRadius : IComponentData
     {
         public float Value;
     }
     
     public struct TargetEntity : IComponentData
     {
-        public Entity Target;
+        public Entity Value;
     }
     
-    public struct NpcAttackProperties : IComponentData
+    public struct AttackProperties : IComponentData
     {
         public float3 FirePointOffset;
-        public uint CooldownTickCount;
+        public float Cooldown;
         public Entity AttackPrefab;
+    }
+    
+    public struct CurrentCooldown : IComponentData
+    {
+        public float Value;
     }
 }
 

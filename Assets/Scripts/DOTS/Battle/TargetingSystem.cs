@@ -47,9 +47,9 @@ namespace DOTS.Battle
 
             [BurstCompile]
             private void Execute(Entity searchingEntity, ref TargetEntity targetEntity,
-                in LocalTransform transform, in TargetingRadius searchRadius)
+                in LocalTransform transform, in EntityTargetingRadius searchRadius)
             {
-                if (targetEntity.Target != Entity.Null)
+                if (targetEntity.Value != Entity.Null)
                 {
                     return;
                 }
@@ -72,11 +72,11 @@ namespace DOTS.Battle
                         }
                     }
 
-                    targetEntity.Target = closestEntity;
+                    targetEntity.Value = closestEntity;
                 }
                 else
                 {
-                    targetEntity.Target = Entity.Null;
+                    targetEntity.Value = Entity.Null;
                 }
                 
                 hits.Dispose();

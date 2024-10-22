@@ -15,13 +15,13 @@ namespace DOTS.Battle
             foreach (var (transform, target, moveSpeed) 
                      in SystemAPI.Query<RefRW<LocalTransform>, TargetEntity, MoveSpeed>())
             {
-                if (target.Target == Entity.Null)
+                if (target.Value == Entity.Null)
                 {
                     continue;
                 }
                 
-                var currentTargetPosition = SystemAPI.GetComponent<LocalTransform>(target.Target).Position;
-                if (math.distance(currentTargetPosition, transform.ValueRO.Position) <= 1.5f)
+                var currentTargetPosition = SystemAPI.GetComponent<LocalTransform>(target.Value).Position;
+                if (math.distance(currentTargetPosition, transform.ValueRO.Position) <= 3f)
                 {
                     continue;
                 }
