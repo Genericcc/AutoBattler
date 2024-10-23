@@ -12,6 +12,7 @@ namespace DOTS.Battle
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent(entity, new DamageOnHitTrigger { Value = authoring.damageOnHitTrigger });
+                AddComponent<AlreadyDamagedEntity>(entity);
             } 
         }
     }

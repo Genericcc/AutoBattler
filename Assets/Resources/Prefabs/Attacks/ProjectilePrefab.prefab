@@ -9,9 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4059482856226628071}
+  - component: {fileID: 4779792091308381152}
+  - component: {fileID: 3144396686860821326}
   - component: {fileID: 5871000063918980500}
   - component: {fileID: 7199568686039187304}
-  - component: {fileID: 4779792091308381152}
   - component: {fileID: 530108208690241412}
   m_Layer: 0
   m_Name: ProjectilePrefab
@@ -36,32 +37,6 @@ Transform:
   - {fileID: 2113479201037138891}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5871000063918980500
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1928673100563396423}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d92335a1bc15410a938de75ddb0ff5a5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  projectileSpeed: 5
---- !u!114 &7199568686039187304
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1928673100563396423}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec7814a56cf3435684fdac4a4bdbf066, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  team: 0
 --- !u!114 &4779792091308381152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,28 +55,28 @@ MonoBehaviour:
     y: 0
     z: 0
   m_PrimitiveSize:
-    x: 1
-    y: 1
-    z: 2.0000005
+    x: 0.20000006
+    y: 0.20000006
+    z: 0.4
   m_PrimitiveOrientation:
     Value:
-      x: -90
+      x: -0
       y: 0
-      z: -90
+      z: 0
     RotationOrder: 4
   m_Capsule:
-    Height: 2.0000005
-    Radius: 0.5
+    Height: 0.4
+    Radius: 0.10000003
     Axis: 2
   m_Cylinder:
-    Height: 2.0000005
-    Radius: 0.5
+    Height: 0.4
+    Radius: 0.10000003
     Axis: 2
   m_CylinderSideCount: 20
-  m_SphereRadius: 1.0000002
+  m_SphereRadius: 0.2
   m_MinimumSkinnedVertexWeight: 0.1
   m_ConvexHullGenerationParameters:
-    m_SimplificationTolerance: 0.030000007
+    m_SimplificationTolerance: 0.01
     m_BevelRadius: 0.05
     m_MinimumAngle: 2.5000002
   m_CustomMesh: {fileID: 0}
@@ -205,6 +180,59 @@ MonoBehaviour:
         Tag07: 0
     m_SerializedVersion: 1
   m_SerializedVersion: 1
+--- !u!54 &3144396686860821326
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928673100563396423}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &5871000063918980500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928673100563396423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d92335a1bc15410a938de75ddb0ff5a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectileSpeed: 5
+--- !u!114 &7199568686039187304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928673100563396423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec7814a56cf3435684fdac4a4bdbf066, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  team: 0
 --- !u!114 &530108208690241412
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,7 +245,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13123391e2b34c4cae44249a2b4c0b9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageOnHitTrigger: 50
+  damageOnHitTrigger: 75
 --- !u!1 &2296459450598835213
 GameObject:
   m_ObjectHideFlags: 0
@@ -230,7 +258,7 @@ GameObject:
   - component: {fileID: 5354103756197415415}
   - component: {fileID: 2210584836783972271}
   m_Layer: 0
-  m_Name: Projectile
+  m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

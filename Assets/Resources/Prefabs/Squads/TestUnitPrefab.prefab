@@ -12,10 +12,12 @@ GameObject:
   - component: {fileID: 5264754666126148370}
   - component: {fileID: 8784419294509694368}
   - component: {fileID: -3169159875031165954}
+  - component: {fileID: 7932483802029334117}
   - component: {fileID: 5586545844461376152}
   - component: {fileID: 4089988260664984297}
   - component: {fileID: -3378420089213915569}
   - component: {fileID: 9104911682184202953}
+  - component: {fileID: 4644110427663669725}
   m_Layer: 0
   m_Name: TestUnitPrefab
   m_TagString: Untagged
@@ -188,7 +190,7 @@ MonoBehaviour:
       m_Value:
         Category00: 0
         Category01: 0
-        Category02: 0
+        Category02: 1
         Category03: 0
         Category04: 0
         Category05: 0
@@ -231,6 +233,33 @@ MonoBehaviour:
         Tag07: 0
     m_SerializedVersion: 1
   m_SerializedVersion: 1
+--- !u!54 &7932483802029334117
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2809366024681623231}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!114 &5586545844461376152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -287,3 +316,17 @@ MonoBehaviour:
   firePointOffset: {x: 0, y: 1.5, z: 0}
   attackPrefab: {fileID: 1928673100563396423, guid: 5a538988914087044bc707c25777f2c5,
     type: 3}
+--- !u!114 &4644110427663669725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2809366024681623231}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4a57736516c4977a6161e5492e6c4c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 150
+  healthBarOffset: {x: 0, y: 0, z: 0}

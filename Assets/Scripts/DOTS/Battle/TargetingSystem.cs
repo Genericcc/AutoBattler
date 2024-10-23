@@ -49,11 +49,6 @@ namespace DOTS.Battle
             private void Execute(Entity searchingEntity, ref TargetEntity targetEntity,
                 in LocalTransform transform, in EntityTargetingRadius searchRadius)
             {
-                if (targetEntity.Value != Entity.Null)
-                {
-                    return;
-                }
-                
                 var hits = new NativeList<DistanceHit>(Allocator.TempJob);
                 if (CollisionWorld.OverlapSphere(transform.Position, searchRadius.Value, ref hits, CollisionFilter))
                 {

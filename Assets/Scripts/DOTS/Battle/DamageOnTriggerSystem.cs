@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics;
 using Unity.Physics.Systems;
+using UnityEngine;
 
 namespace DOTS.Battle
 {
@@ -82,6 +83,8 @@ namespace DOTS.Battle
             var damageOnTrigger = DamageOnTriggerLookup[damageDealingEntity];
             ECB.AppendToBuffer(damageReceivingEntity, new DamageBufferElement { Value = damageOnTrigger.Value });
             ECB.AppendToBuffer(damageDealingEntity, new AlreadyDamagedEntity { Value = damageReceivingEntity });
+            
+            ECB.AddComponent<DestroyEntityTag>(damageDealingEntity);
         }
     }
 }
