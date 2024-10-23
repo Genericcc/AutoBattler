@@ -1,14 +1,13 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
 
 namespace DOTS.Battle
 {
-    public struct MaxHitPoints : IComponentData
+    public struct MaxHealth : IComponentData
     {
         public int Value;
     }
-    public struct CurrentHitPoints : IComponentData
+    public struct CurrentHealth : IComponentData
     {
         public int Value;
     }
@@ -16,6 +15,11 @@ namespace DOTS.Battle
     public struct DamageBufferElement : IBufferElementData
     {
         public int Value;
+    }
+    
+    public struct AlreadyDamagedEntity : IBufferElementData
+    {
+        public Entity Value;
     }
 
     public struct AttackPrefabs : IComponentData
@@ -30,7 +34,7 @@ namespace DOTS.Battle
     
     public struct DestroyEntityTag : IComponentData {}
 
-    public struct DamageOnTrigger : IComponentData
+    public struct DamageOnHitTrigger : IComponentData
     {
         public int Value;
     }

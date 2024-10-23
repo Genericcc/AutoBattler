@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: TestArcherSquadData
   m_EditorClassIdentifier: 
   squadDataID: 420
+  rowUnitCount: 2
+  columnUnitCount: 2
   size: {x: 2, y: 2}
   prefab: {fileID: 2809366024681623231, guid: c87f8d4d18589e04cb6d170e0f546e74, type: 3}

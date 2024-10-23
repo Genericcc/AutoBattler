@@ -15,7 +15,7 @@ namespace DOTS.Battle
             public override void Bake(AttackerAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);                
-                AddComponent(entity, new AttackRadius()
+                AddComponent(entity, new AttackRadius
                 {
                     Value = authoring.attackRadius
                 });

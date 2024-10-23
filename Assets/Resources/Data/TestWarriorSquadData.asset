@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: TestWarriorSquadData
   m_EditorClassIdentifier: 
   squadDataID: 69
+  rowUnitCount: 1
+  columnUnitCount: 1
   size: {x: 1, y: 1}
   prefab: {fileID: 2809366024681623231, guid: c87f8d4d18589e04cb6d170e0f546e74, type: 3}

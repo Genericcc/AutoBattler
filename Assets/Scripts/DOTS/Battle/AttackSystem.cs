@@ -54,7 +54,7 @@ namespace DOTS.Battle
 
             var newAttack = ECB.Instantiate(sortKey, attackProperties.AttackPrefab);
             var newAttackTransform = LocalTransform.FromPositionRotation(spawnPosition,
-                quaternion.LookRotationSafe(targetPosition - spawnPosition, math.up()));
+                quaternion.LookRotationSafe(targetPosition - spawnPosition, math.back()));
             
             var newCooldown = new CurrentCooldown { Value = attackProperties.Cooldown }; 
             

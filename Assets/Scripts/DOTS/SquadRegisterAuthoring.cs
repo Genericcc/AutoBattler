@@ -23,6 +23,8 @@ namespace DOTS
                         SquadId = squadData.squadDataID,
                         Prefab = GetEntity(squadData.prefab, TransformUsageFlags.Dynamic),
                         Size = math.int2(squadData.size),
+                        RowUnitCount = squadData.rowUnitCount,
+                        ColumnUnitCount = squadData.columnUnitCount,
                     });
                 }
             }

@@ -15,6 +15,8 @@ namespace DOTS
         public int SquadId;
         public Entity Prefab;
         public int2 Size;
+        public int RowUnitCount;
+        public int ColumnUnitCount;
     }
 
     // public struct SquadSpawnInput : IComponentData

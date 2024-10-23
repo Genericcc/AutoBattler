@@ -40,11 +40,21 @@ namespace DOTS
                     Debug.Log($"No space found for squad with ID: {spawnOrders[i].SquadID}!");
                     continue;
                 }
+
+                var unitShift = new int2(squadElement.Size.x / squadElement.RowUnitCount, squadElement.Size.y / squadElement.ColumnUnitCount);
+                
+                for (var x = 0; x < squadElement.RowUnitCount; x++)
+                {
+                    for (var y = 0; y < squadElement.ColumnUnitCount; y++)
+                    {
+                        var e = ecb.Instantiate(squadElement.Prefab);
+                        var shiftedPosition = spawnPosition.Position + new float3(unitShift.x * x, 0, unitShift.y * y);
+                        var newPosition = LocalTransform.FromPosition(shiftedPosition);
+                        ecb.SetComponent(e, newPosition);
+                    }
+                }
                     
-                var e = ecb.Instantiate(squadElement.Prefab);
-                ecb.SetComponent(e, spawnPosition);
-                    
-                Debug.Log("Spawned!");
+                Debug.Log("Squad Spawned!");
             }
             
             spawnOrders.Clear();
