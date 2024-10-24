@@ -69,8 +69,6 @@ namespace DOTS
                         ecb.SetComponent(squadUnit, new URPMaterialPropertyBaseColor { Value = teamColor, });
                     }
                 }
-                    
-                Debug.Log($"{spawnOrders[i].TeamType} Squad Spawned!");
             }
             
             spawnOrders.Clear();
