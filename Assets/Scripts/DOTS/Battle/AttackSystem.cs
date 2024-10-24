@@ -1,4 +1,5 @@
-﻿using Unity.Burst;
+﻿using DOTS.Rounds;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -17,6 +18,14 @@ namespace DOTS.Battle
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            foreach (var roundState in SystemAPI.Query<RoundState>())
+            {
+                if (roundState.RoundStateType != RoundStateType.Playing)
+                {
+                    return;
+                }
+            }
+            
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             
             state.Dependency = new AttackJob

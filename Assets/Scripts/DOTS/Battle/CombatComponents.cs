@@ -70,6 +70,8 @@ namespace DOTS.Battle
     {
         public float Value;
     }
+    
+    public struct CountdownToStartTag : IComponentData {}
 }
 
 

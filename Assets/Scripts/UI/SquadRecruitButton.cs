@@ -1,17 +1,19 @@
 ﻿using Data;
 using DOTS;
+using DOTS.Battle;
 using Sirenix.OdinInspector;
 using Unity.Collections;
 using Unity.Entities;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI
 {
     public class SquadRecruitButton : Button
     {
-        [SerializeField]
-        public BaseSquadData _squadData;
+        [ShowInInspector]
+        private BaseSquadData _squadData;
+
+        private TeamType _teamType;
 
         protected override void OnDisable()
         {
@@ -20,9 +22,10 @@ namespace UI
             onClick.RemoveAllListeners();
         }
 
-        public void Init(BaseSquadData baseSquadData)
+        public void Init(BaseSquadData baseSquadData, TeamType teamType)
         {
             _squadData = baseSquadData;
+            _teamType = teamType;
             
             onClick.AddListener(SpawnSquad);
         }
@@ -40,6 +43,7 @@ namespace UI
                     .Add(new SquadSpawnOrder 
                     { 
                         SquadID = _squadData.squadDataID,
+                        TeamType = _teamType,
                     });
             }
 

@@ -7,7 +7,6 @@ using Slider = UnityEngine.UI.Slider;
 namespace DOTS.Views
 {
     [UpdateAfter(typeof(TransformSystemGroup))]
-    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     public partial struct HealthBarSystem : ISystem
     {
         public void OnCreate(ref SystemState state)
@@ -26,6 +25,8 @@ namespace DOTS.Views
                      in SystemAPI.Query<LocalTransform, HealthBarOffset, MaxHealth>()
                                  .WithNone<HealthBarUIReference>().WithEntityAccess())
             {
+                Debug.Log("Inside healthbarsystem");
+                
                 var healthBarPrefab = SystemAPI.ManagedAPI.GetSingleton<ViewsPrefabs>().HealthBar;
                 var spawnPosition = transform.Position + healthBarOffset.Value;
                 var newHealthBar = Object.Instantiate(healthBarPrefab, spawnPosition, Quaternion.identity);

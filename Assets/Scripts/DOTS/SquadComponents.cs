@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using DOTS.Battle;
+using Unity.Entities;
 using Unity.Mathematics;
 
 namespace DOTS
@@ -8,6 +9,7 @@ namespace DOTS
     public struct SquadSpawnOrder : IBufferElementData
     {
         public int SquadID;
+        public TeamType TeamType;
     }
     
     public struct SquadElement : IBufferElementData

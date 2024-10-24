@@ -40,17 +40,5 @@ namespace Battle
 
             squadRecruitmentView.Init(testSquadsRegister.availableSquads);
         }
-
-        // public void SpawnSquad(BaseSquadData squadData)
-        // {
-        //     var spawnPosition = battleGrid.GetMiddlePosition(squadData.size);
-        //     
-        //     World.DefaultGameObjectInjectionWorld.EntityManager
-        //         .GetBuffer<SquadSpawnOrder>(_entity)
-        //         .Add(new SquadSpawnOrder 
-        //         { 
-        //             SquadID = squadData.squadDataID,
-        //         });
-        // }
     }
 }

@@ -1,3 +1,4 @@
+using DOTS.Rounds;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -8,13 +9,26 @@ namespace DOTS.Battle
 {
     public partial struct MoveUnitSystem : ISystem
     {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
+        }
+
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            foreach (var roundState in SystemAPI.Query<RoundState>())
+            {
+                if (roundState.RoundStateType != RoundStateType.Playing)
+                {
+                    return;
+                }
+            }
+            
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var deltaTime = SystemAPI.Time.DeltaTime;
             
-            state.Dependency = new MyJob
+            state.Dependency = new UpdateTargetJob
             {
                 DeltaTime = deltaTime,
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(),
@@ -24,7 +38,7 @@ namespace DOTS.Battle
     }
     
     [BurstCompile]
-    public partial struct MyJob : IJobEntity
+    public partial struct UpdateTargetJob : IJobEntity
     {
         [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
         [ReadOnly] public float DeltaTime;

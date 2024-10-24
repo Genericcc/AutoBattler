@@ -1,4 +1,5 @@
 ﻿using Unity.Entities;
+using Unity.Rendering;
 using UnityEngine;
 
 namespace DOTS.Battle
@@ -12,6 +13,7 @@ namespace DOTS.Battle
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent(entity, new Team { Value = authoring.team });
+                AddComponent<URPMaterialPropertyBaseColor>(entity);
             }
         }
     }

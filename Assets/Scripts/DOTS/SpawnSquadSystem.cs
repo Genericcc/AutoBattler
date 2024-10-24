@@ -1,6 +1,9 @@
-﻿using Unity.Collections;
+﻿using DOTS.Battle;
+using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -8,6 +11,7 @@ namespace DOTS
 {
     public partial struct SpawnSquadSystem : ISystem
     {
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<SquadElement>();
@@ -15,6 +19,7 @@ namespace DOTS
             state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
         }
 
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var availableSquads = SystemAPI.GetSingletonBuffer<SquadElement>();
@@ -47,19 +52,31 @@ namespace DOTS
                 {
                     for (var y = 0; y < squadElement.ColumnUnitCount; y++)
                     {
-                        var e = ecb.Instantiate(squadElement.Prefab);
+                        var squadUnit = ecb.Instantiate(squadElement.Prefab);
                         var shiftedPosition = spawnPosition.Position + new float3(unitShift.x * x, 0, unitShift.y * y);
                         var newPosition = LocalTransform.FromPosition(shiftedPosition);
-                        ecb.SetComponent(e, newPosition);
+                        ecb.SetComponent(squadUnit, newPosition);
+                        
+                        ecb.SetComponent(squadUnit, new Team { Value = spawnOrders[i].TeamType});
+                        
+                        var teamColor = spawnOrders[i].TeamType switch
+                        {
+                            TeamType.Blue => new float4(0, 0, 1, 1),
+                            TeamType.Red => new float4(1, 0, 0, 1),
+                            _ => new float4(0),
+                        };
+                        
+                        ecb.SetComponent(squadUnit, new URPMaterialPropertyBaseColor { Value = teamColor, });
                     }
                 }
                     
-                Debug.Log("Squad Spawned!");
+                Debug.Log($"{spawnOrders[i].TeamType} Squad Spawned!");
             }
             
             spawnOrders.Clear();
         }
 
+        [BurstCompile]
         private bool TryFindSpaceForSquad(ref SystemState state, int2 squadSize, out LocalTransform spawnPosition)
         {
             var battleGridEntity = SystemAPI.GetSingletonEntity<BattleGridTag>();
@@ -117,7 +134,8 @@ namespace DOTS
             return false;
         }
 
-        private static void LockNodes(NativeList<GridNode> squadNodes, ref DynamicBuffer<GridNode> gridNodes)
+        [BurstCompile]
+        private static void LockNodes(in NativeList<GridNode> squadNodes, ref DynamicBuffer<GridNode> gridNodes)
         {
             foreach (var node in squadNodes)
             {
@@ -127,6 +145,7 @@ namespace DOTS
             }
         }
 
+        [BurstCompile]
         private NativeList<GridNode> GetNodes(GridNode startNode, 
             int2 gridSize, 
             int2 squadSize, 
@@ -160,6 +179,7 @@ namespace DOTS
             return results;
         }
 
+        [BurstCompile]
         private bool CanHostSquad(NativeList<GridNode> hostingNodes, int2 squadSize)
         {
             if (hostingNodes.Length < squadSize.x * squadSize.y)
@@ -178,18 +198,19 @@ namespace DOTS
             return true;
         }
 
-        private static bool TryGetSquad(DynamicBuffer<SquadElement> squads, int requestedId, out SquadElement squad)
+        [BurstCompile]
+        private static bool TryGetSquad(in DynamicBuffer<SquadElement> squads, int requestedId, out SquadElement result)
         {
             for (var i = 0; i < squads.Length; i++)
             {
                 if (squads[i].SquadId == requestedId)
                 {
-                    squad = squads[i];
+                    result = squads[i];
                     return true;
                 }
             }
 
-            squad = new SquadElement();
+            result = new SquadElement();
             return false;
         }
     }
