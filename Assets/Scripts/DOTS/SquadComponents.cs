@@ -12,7 +12,7 @@ namespace DOTS
         public TeamType TeamType;
     }
     
-    public struct SquadElement : IBufferElementData
+    public struct SquadData : IBufferElementData
     {
         public int SquadId;
         public Entity Prefab;
@@ -20,9 +20,4 @@ namespace DOTS
         public int RowUnitCount;
         public int ColumnUnitCount;
     }
-
-    // public struct SquadSpawnInput : IComponentData
-    // {
-    //     public bool SpawnWarriorSquad;
-    // }
 }

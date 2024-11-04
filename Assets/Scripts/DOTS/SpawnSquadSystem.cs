@@ -1,4 +1,5 @@
 ﻿using DOTS.Battle;
+using DOTS.Grid;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -14,37 +15,45 @@ namespace DOTS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<SquadElement>();
-            state.RequireForUpdate<BattleGridTag>();
+            state.RequireForUpdate<GridSystemData>();
+            state.RequireForUpdate<BattleGridDimensions>();
+            state.RequireForUpdate<SquadData>();
+            //state.RequireForUpdate<BattleGridTag>();
             state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var availableSquads = SystemAPI.GetSingletonBuffer<SquadElement>();
             var spawnOrders = SystemAPI.GetSingletonBuffer<SquadSpawnOrder>();
-            var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             
             if (spawnOrders.Length <= 0)
             {
                 return;
             }
+            
+            var availableSquads = SystemAPI.GetSingletonBuffer<SquadData>();
+            var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            for (var i = 0; i < spawnOrders.Length; i++)
+            foreach (var squadSpawnOrder in spawnOrders)
             {
-                if (!TryGetSquad(availableSquads, spawnOrders[i].SquadID, out var squadElement))
+                if (!TryGetSquad(availableSquads, squadSpawnOrder.SquadID, out var squadElement))
                 {
-                    Debug.Log($"No available squad with ID: {spawnOrders[i].SquadID}!");
+                    Debug.Log($"No available squad with ID: {squadSpawnOrder.SquadID}!");
                     continue;
                 }
 
-                if (!TryFindSpaceForSquad(ref state, squadElement.Size, out var spawnPosition))
+                if (!TryFindNodesForSquad(ref state, squadElement.Size, squadSpawnOrder.TeamType, out var spawnNodes))
                 {
-                    Debug.Log($"No space found for squad with ID: {spawnOrders[i].SquadID}!");
+                    Debug.Log($"No space found for squad with ID: {squadSpawnOrder.SquadID}!");
+                    spawnNodes.Dispose();
                     continue;
                 }
+                
+                LockNodes(ref state, spawnNodes, squadSpawnOrder.TeamType);
+
+                var spawnPosition = GetSpawnPosition(spawnNodes);
 
                 var unitShift = new int2(squadElement.Size.x / squadElement.RowUnitCount, squadElement.Size.y / squadElement.ColumnUnitCount);
                 
@@ -55,33 +64,54 @@ namespace DOTS
                         var squadUnit = ecb.Instantiate(squadElement.Prefab);
                         var shiftedPosition = spawnPosition.Position + new float3(unitShift.x * x, 0, unitShift.y * y);
                         var newPosition = LocalTransform.FromPosition(shiftedPosition);
-                        ecb.SetComponent(squadUnit, newPosition);
-                        
-                        ecb.SetComponent(squadUnit, new Team { Value = spawnOrders[i].TeamType});
-                        
-                        var teamColor = spawnOrders[i].TeamType switch
+                        var teamColor = squadSpawnOrder.TeamType switch
                         {
                             TeamType.Blue => new float4(0, 0, 1, 1),
                             TeamType.Red => new float4(1, 0, 0, 1),
                             _ => new float4(0),
                         };
                         
+                        ecb.SetComponent(squadUnit, newPosition);
+                        ecb.SetComponent(squadUnit, new Team { Value = squadSpawnOrder.TeamType});
                         ecb.SetComponent(squadUnit, new URPMaterialPropertyBaseColor { Value = teamColor, });
                     }
                 }
+                
+                spawnNodes.Dispose();
             }
             
             spawnOrders.Clear();
         }
 
         [BurstCompile]
-        private bool TryFindSpaceForSquad(ref SystemState state, int2 squadSize, out LocalTransform spawnPosition)
+        private bool TryFindNodesForSquad(ref SystemState state, int2 squadSize, TeamType squadTeam, out NativeList<GridNode> squadNodes)
         {
-            var battleGridEntity = SystemAPI.GetSingletonEntity<BattleGridTag>();
-            var gridNodes = SystemAPI.GetBuffer<GridNode>(battleGridEntity);
-            var gridProperties = SystemAPI.GetComponent<BattleGridProperties>(battleGridEntity);
+            //var battleGridEntity = SystemAPI.GetSingletonEntity<BattleGridTag>();
+            // var gridNodes = SystemAPI.GetBuffer<GridNode>(battleGridEntity);
+            var gridProperties = SystemAPI.GetSingleton<BattleGridDimensions>();
+            var gridSystemData = SystemAPI.GetSingleton<GridSystemData>();            
             
+            var gridNodes = new NativeArray<GridNode>();
+            squadNodes = new NativeList<GridNode>();
+            
+            foreach (var teamBattleGrid in gridSystemData.TeamBattleGrids)
+            {
+                if (teamBattleGrid.Team == squadTeam)
+                {
+                    gridNodes = teamBattleGrid.Nodes;
+                    break;
+                }
+            }
+
+            if (gridNodes.Length <= 0)
+            {
+                Debug.Log($"Coś się spierdoliło, nie ma gridu dla teamu: {squadTeam}");
+                gridNodes.Dispose();
+                return false;
+            }
+
             var gridSize = new int2(gridProperties.Width, gridProperties.Height);
+            
             int x = 0, y = 0;
             int dx = 0, dy = -1;
             var maxVal = math.max(gridSize.x, gridSize.y);
@@ -97,23 +127,12 @@ namespace DOTS
                         currentCoords.y >= 0 && currentCoords.y < gridSize.y)
                     {
                         var startNode = gridNodes[Helpers.CalculateIndex(currentCoords.x, currentCoords.y, gridSize)];
-                        var squadNodes = GetNodes(startNode, gridSize, squadSize, gridNodes);
+                        squadNodes = GetNodes(startNode, gridSize, squadSize, gridNodes);
 
                         if (CanHostSquad(squadNodes, squadSize))
                         {
-                            LockNodes(squadNodes, ref gridNodes);
-                            
-                            spawnPosition = new LocalTransform
-                            {
-                                Position = Helpers.GetPosition(new int2(startNode.X, startNode.Y)) + new float3(0.5f, 0, 0.5f),
-                                Rotation = quaternion.identity,
-                                Scale = 1f,
-                            };
-                            squadNodes.Dispose();
                             return true;
                         }
-
-                        squadNodes.Dispose();
                     }
                 }
 
@@ -127,14 +146,43 @@ namespace DOTS
                 x += dx;
                 y += dy;
             }
-
-            spawnPosition = LocalTransform.FromPosition(0, -100, 0);
+            
             return false;
         }
 
+        //TODO test and fix if needed
         [BurstCompile]
-        private static void LockNodes(in NativeList<GridNode> squadNodes, ref DynamicBuffer<GridNode> gridNodes)
+        private LocalTransform GetSpawnPosition(NativeList<GridNode> squadNodes)
         {
+            var startNode = squadNodes[0];
+            
+            return new LocalTransform
+            {
+                Position = Helpers.GetPosition(new int2(startNode.X, startNode.Y)) + new float3(0.5f, 0, 0.5f),
+                Rotation = quaternion.identity,
+                Scale = 1f,
+            };
+        }
+
+        [BurstCompile]
+        private void LockNodes(ref SystemState state, in NativeList<GridNode> squadNodes, TeamType teamType)
+        {
+            var gridSystemData = SystemAPI.GetSingleton<GridSystemData>();
+            var gridNodes = new NativeArray<GridNode>();
+            
+            foreach (var teamBattleGrid in gridSystemData.TeamBattleGrids)
+            {
+                if (teamBattleGrid.Team == teamType)
+                {
+                    gridNodes = teamBattleGrid.Nodes;
+                }
+            }
+
+            if (gridNodes.Length <= 0)
+            {
+                Debug.Log($"Coś się spierdoliło, Lock nieudany");
+            }
+            
             foreach (var node in squadNodes)
             {
                 var gridNode = gridNodes[node.Index];
@@ -147,7 +195,7 @@ namespace DOTS
         private NativeList<GridNode> GetNodes(GridNode startNode, 
             int2 gridSize, 
             int2 squadSize, 
-            DynamicBuffer<GridNode> gridNodes)
+            NativeArray<GridNode> gridNodes)
         {
             var results = new NativeList<GridNode>(Allocator.Temp);
             
@@ -197,7 +245,7 @@ namespace DOTS
         }
 
         [BurstCompile]
-        private static bool TryGetSquad(in DynamicBuffer<SquadElement> squads, int requestedId, out SquadElement result)
+        private static bool TryGetSquad(in DynamicBuffer<SquadData> squads, int requestedId, out SquadData result)
         {
             for (var i = 0; i < squads.Length; i++)
             {
@@ -208,7 +256,7 @@ namespace DOTS
                 }
             }
 
-            result = new SquadElement();
+            result = new SquadData();
             return false;
         }
     }

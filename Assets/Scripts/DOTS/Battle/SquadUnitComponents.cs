@@ -7,6 +7,11 @@ namespace DOTS.Battle
         public TeamType Value;
     }
     
+    public struct PlayingTeam : IBufferElementData
+    {
+        public TeamType Value;
+    }
+    
     public struct MoveSpeed : IComponentData
     {
         public float Value;

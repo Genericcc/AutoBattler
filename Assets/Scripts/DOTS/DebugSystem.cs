@@ -1,4 +1,5 @@
-﻿// using Unity.Burst;
+﻿// using DOTS.Grid;
+// using Unity.Burst;
 // using Unity.Entities;
 // using UnityEngine;
 //
@@ -8,20 +9,16 @@
 //     {
 //         public void OnCreate(ref SystemState state)
 //         {
-//             state.RequireForUpdate<BattleGridTag>();
+//             state.RequireForUpdate<GridSystemData>();
 //         }
 //         
 //         public void OnUpdate(ref SystemState state)
 //         {
-//             var battleGridEntity = SystemAPI.GetSingletonEntity<BattleGridTag>();
-//             var grinNodes = SystemAPI.GetBuffer<GridNode>(battleGridEntity);
+//             var gridSystemData = SystemAPI.GetSingleton<GridSystemData>();
 //
-//             foreach (var gridNode in grinNodes)
-//             {
-//                 if (gridNode.IsFree)
-//                 {
-//                     Debug.Log($"{gridNode.X}, {gridNode.Y}, i: {gridNode.Index}");
-//                 }
+//             foreach (var gridNode in gridSystemData.TeamBattleGrid.Nodes)
+//             {                    
+//                 Debug.Log($"{gridNode.X}, {gridNode.Y}, i: {gridNode.Index}");
 //             }
 //         }
 //     }

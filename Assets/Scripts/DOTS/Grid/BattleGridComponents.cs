@@ -1,18 +1,32 @@
-﻿using Unity.Collections;
+﻿using DOTS.Battle;
+using Unity.Collections;
 using Unity.Entities;
-using Unity.Transforms;
 
-namespace DOTS
+namespace DOTS.Grid
 {
     public struct BattleGridTag : IComponentData {}
 
-    public struct BattleGridProperties : IComponentData
+    public struct BattleGridDimensions : IComponentData
     {
         public int Width;
         public int Height;
     }
 
-    public struct GridNode : IBufferElementData
+    public struct GridSystemData : IComponentData
+    {
+        //public TeamBattleGrid TeamBattleGrid;
+        public NativeArray<TeamBattleGrid> TeamBattleGrids;
+    }
+
+    public struct TeamBattleGrid
+    {
+        public int Width;
+        public int Height;
+        public TeamType Team;
+        public NativeArray<GridNode> Nodes;
+    }
+
+    public struct GridNode : IComponentData
     {
         public int X;
         public int Y;
@@ -21,10 +35,4 @@ namespace DOTS
 
         public bool IsFree;
     }
-
-    // public struct SquadSpawnProperties : IComponentData
-    // {
-    //     public LocalTransform SpawnTransform;
-    //     public NativeArray<GridNode> SpawnNodes;
-    // }
 }

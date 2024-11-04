@@ -14,11 +14,11 @@ namespace DOTS
             public override void Bake(SquadRegisterAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.None);
-                var prefabsBuffer = AddBuffer<SquadElement>(entity);
+                var prefabsBuffer = AddBuffer<SquadData>(entity);
                 
                 foreach (var squadData in authoring.testSquadsRegister.availableSquads)
                 {
-                    prefabsBuffer.Add(new SquadElement
+                    prefabsBuffer.Add(new SquadData
                     {
                         SquadId = squadData.squadDataID,
                         Prefab = GetEntity(squadData.prefab, TransformUsageFlags.Dynamic),

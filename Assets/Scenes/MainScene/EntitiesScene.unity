@@ -168,6 +168,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   battleGridData: {fileID: 11400000, guid: 014f517cc3b652f45b134149b791443e, type: 2}
+  playingTeams: 0100000002000000
 --- !u!1001 &566279404
 PrefabInstance:
   m_ObjectHideFlags: 0

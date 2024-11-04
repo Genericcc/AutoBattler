@@ -1,22 +1,26 @@
-﻿using Battle;
+﻿using DOTS.Battle;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
-namespace DOTS
+namespace DOTS.Grid
 {
     public partial struct CreateBattleGridSystem : ISystem
     {
-        public NativeArray<GridNode> GridNodes;
-        public int2 GridSize;
-        
+        private NativeArray<GridNode> _gameGridArray;
+        private NativeArray<TeamBattleGrid> _gameGrids;
+
         //[BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<BeginInitializationEntityCommandBufferSystem.Singleton>();
-            state.RequireForUpdate<BattleGridProperties>();
+            state.RequireForUpdate<BattleGridDimensions>();
+            state.RequireForUpdate<GridSystemData>();
+
+            state.EntityManager.AddComponent<GridSystemData>(state.SystemHandle);
         }
 
         //[BurstCompile]
@@ -24,60 +28,66 @@ namespace DOTS
         {
             state.Enabled = false;
 
-            var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
-            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-
-            var battleGridProperties = SystemAPI.GetSingleton<BattleGridProperties>();
-            GridSize = new int2(battleGridProperties.Width, battleGridProperties.Height);
-
-            if (GridNodes.IsCreated)
-            {
-                GridNodes.Dispose();
-            }
+            var teamBuffer = SystemAPI.GetSingletonBuffer<PlayingTeam>();
+            var battleGridDimensions = SystemAPI.GetSingleton<BattleGridDimensions>();
+            var gridSize = new int2(battleGridDimensions.Width, battleGridDimensions.Height);
             
-            GridNodes = new NativeArray<GridNode>(GridSize.x * GridSize.y, Allocator.Temp);
+            _gameGridArray = new NativeArray<GridNode>(gridSize.x * gridSize.y, Allocator.Persistent);
+            _gameGrids = new NativeArray<TeamBattleGrid>(teamBuffer.Length, Allocator.Persistent);
             
-            for (var x = 0; x < GridSize.x; x++)
+            Debug.Log($"{teamBuffer.Length} teams");
+            
+            for (var i = 0; i < teamBuffer.Length; i++)
             {
-                for (var y = 0; y < GridSize.y; y++) 
+                var nodes = new NativeArray<GridNode>(gridSize.x * gridSize.y, Allocator.Temp);
+
+                for (var x = 0; x < gridSize.x; x++)
                 {
-                    var gridNode = new GridNode
+                    for (var y = 0; y < gridSize.y; y++)
                     {
-                        X = x,
-                        Y = y,
-                        
-                        Index = Helpers.CalculateIndex(x, y, GridSize),
-                        
-                        IsFree = true,
-                    };
+                        var gridNode = new GridNode
+                        {
+                            X = x,
+                            Y = y,
 
-                    GridNodes[gridNode.Index] = gridNode;
+                            Index = Helpers.CalculateIndex(x, y, gridSize),
+
+                            IsFree = true,
+                        };
+
+                        nodes[gridNode.Index] = gridNode;
+                    }
                 }
-            }
+                
+                var teamBattleGrid = new TeamBattleGrid
+                {
+                    Width = gridSize.x, 
+                    Height = gridSize.y, 
+                    Team = teamBuffer[i].Value, 
+                    Nodes = _gameGridArray
+                };
 
-            var entity = ecb.CreateEntity(); 
-            ecb.AddComponent<BattleGridTag>(entity);
-            ecb.AddComponent(entity, new BattleGridProperties
-            {
-                Width = GridSize.x,
-                Height = GridSize.y,
-            });
-            
-            ecb.AddBuffer<GridNode>(entity);
-            foreach (var gridNode in GridNodes)
-            {
-                ecb.AppendToBuffer(entity, gridNode);
+                for (var index = 0; index < nodes.Length; index++)
+                {
+                    var gridNode = nodes[index];
+                    teamBattleGrid.Nodes[index] = new GridNode { Index = gridNode.Index, X = gridNode.X, Y = gridNode.Y, IsFree = true};
+                }
+                
+                _gameGrids[i] = teamBattleGrid;
+                
+                nodes.Dispose();
             }
+            
+            state.EntityManager.SetComponentData(state.SystemHandle, new GridSystemData { TeamBattleGrids = _gameGrids });
+
+            battleGridDimensions.Width = gridSize.x;
+            battleGridDimensions.Height = gridSize.y;
         }
-        
-        public LocalTransform GetMiddlePosition(int2 squadDataSize)
+    
+        public void OnDestroy(ref SystemState state)
         {
-            var middlePos = GridNodes[Helpers.CalculateIndex(GridSize.x / 2, GridSize.y / 2, GridSize)];
-            
-            var position = Helpers.GetPosition(new int2(middlePos.X, middlePos.Y));
-            var localTransform = LocalTransform.FromPositionRotation(position, quaternion.identity);
-
-            return localTransform;
+            _gameGridArray.Dispose();
+            _gameGrids.Dispose();
         }
     }
 }
