@@ -1,6 +1,7 @@
 ﻿using DOTS.Battle;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace DOTS.Grid
 {
@@ -14,14 +15,15 @@ namespace DOTS.Grid
 
     public struct GridSystemData : IComponentData
     {
-        //public TeamBattleGrid TeamBattleGrid;
         public NativeArray<TeamBattleGrid> TeamBattleGrids;
     }
 
     public struct TeamBattleGrid
     {
         public int Width;
-        public int Height;
+        public int Height;        
+        public int2 OriginShift;
+
         public TeamType Team;
         public NativeArray<GridNode> Nodes;
     }
