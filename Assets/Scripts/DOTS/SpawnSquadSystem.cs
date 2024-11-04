@@ -18,7 +18,6 @@ namespace DOTS
             state.RequireForUpdate<GridSystemData>();
             state.RequireForUpdate<BattleGridDimensions>();
             state.RequireForUpdate<SquadData>();
-            //state.RequireForUpdate<BattleGridTag>();
             state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
         }
 
@@ -26,7 +25,6 @@ namespace DOTS
         public void OnUpdate(ref SystemState state)
         {
             var spawnOrders = SystemAPI.GetSingletonBuffer<SquadSpawnOrder>();
-            
             if (spawnOrders.Length <= 0)
             {
                 return;
@@ -60,7 +58,7 @@ namespace DOTS
                 
                 LockNodes(teamBattleGrid, spawnNodes);
 
-                var spawnPosition = GetSpawnPosition(teamBattleGrid, spawnNodes);
+                var squadOrigin = GetSpawnPosition(teamBattleGrid, spawnNodes);
                 var unitShift = new int2(squadElement.Size.x / squadElement.RowUnitCount, squadElement.Size.y / squadElement.ColumnUnitCount);
                 
                 for (var x = 0; x < squadElement.RowUnitCount; x++)
@@ -68,8 +66,11 @@ namespace DOTS
                     for (var y = 0; y < squadElement.ColumnUnitCount; y++)
                     {
                         var squadUnit = ecb.Instantiate(squadElement.Prefab);
-                        var shiftedPosition = spawnPosition.Position + new float3(unitShift.x * x, 0, unitShift.y * y);
-                        var newPosition = LocalTransform.FromPosition(shiftedPosition);
+                        
+                        var shiftedPosition = squadOrigin + new float3(unitShift.x * x, 0, unitShift.y * y);
+                        var rotation = quaternion.RotateY(teamBattleGrid.OriginShift.Rotation);
+                        var newPosition = LocalTransform.FromPositionRotation(shiftedPosition, rotation);
+                        
                         var teamColor = squadSpawnOrder.TeamType switch
                         {
                             TeamType.Blue => new float4(0, 0, 1, 1),
@@ -157,17 +158,19 @@ namespace DOTS
 
         //TODO test and fix if needed
         [BurstCompile]
-        private LocalTransform GetSpawnPosition(TeamBattleGrid teamBattleGrid, NativeList<GridNode> squadNodes)
+        private float3 GetSpawnPosition(TeamBattleGrid teamBattleGrid, NativeList<GridNode> squadNodes)
         {
             var startNode = squadNodes[0];
-            var offset = teamBattleGrid.OriginShift;
+            var offset = teamBattleGrid.OriginShift.Offset;
             
-            return new LocalTransform
-            {
-                Position = Helpers.GetPosition(offset + new int2(startNode.X, startNode.Y)) + new float3(0.5f, 0, 0.5f),
-                Rotation = quaternion.identity,
-                Scale = 1f,
-            };
+            // return new LocalTransform
+            // {
+            //     Position = Helpers.GetPosition(new int2(offset.x, offset.y) + new int2(startNode.X, startNode.Y)) + new float3(0.5f, 0, 0.5f),
+            //     Rotation =  quaternion.identity,
+            //     Scale = 1f,
+            // };
+
+            return Helpers.GetPosition(new int2(offset.x, offset.y) + new int2(startNode.X, startNode.Y)) + new float3(0.5f, 0, 0.5f);
         }
 
         [BurstCompile]

@@ -57,7 +57,7 @@ namespace DOTS.Grid
                 {
                     Width = gridSize.x, 
                     Height = gridSize.y, 
-                    OriginShift = i == 0 ? new int2() : new int2(0, gridSize.y), //TODO zmienić żeby był offset i rotacja?
+                    OriginShift = i != 0 ? new SpawnOffset() : new SpawnOffset { Offset = new int2(0, gridSize.y), Rotation = math.PI }, //TODO zmienić żeby była też rotacja?
                     Team = teamBuffer[i].Value, 
                     Nodes = nodes,
                 };
@@ -88,5 +88,11 @@ namespace DOTS.Grid
             
             _teamGrids.Dispose();
         }
+    }
+
+    public struct SpawnOffset
+    {
+        public int2 Offset;
+        public float Rotation;
     }
 }

@@ -22,7 +22,7 @@ namespace DOTS.Grid
     {
         public int Width;
         public int Height;        
-        public int2 OriginShift;
+        public SpawnOffset OriginShift;
 
         public TeamType Team;
         public NativeArray<GridNode> Nodes;
