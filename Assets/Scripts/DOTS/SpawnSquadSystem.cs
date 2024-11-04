@@ -66,10 +66,9 @@ namespace DOTS
                     for (var y = 0; y < squadElement.ColumnUnitCount; y++)
                     {
                         var squadUnit = ecb.Instantiate(squadElement.Prefab);
-                        
-                        var shiftedPosition = squadOrigin + new float3(unitShift.x * x, 0, unitShift.y * y);
-                        var rotation = quaternion.RotateY(teamBattleGrid.OriginShift.Rotation);
-                        var newPosition = LocalTransform.FromPositionRotation(shiftedPosition, rotation);
+
+                        var adjustedPosition = squadOrigin;
+                        adjustedPosition.Position += new float3(unitShift.x * x, 0, unitShift.y * y);
                         
                         var teamColor = squadSpawnOrder.TeamType switch
                         {
@@ -78,7 +77,7 @@ namespace DOTS
                             _ => new float4(0),
                         };
                         
-                        ecb.SetComponent(squadUnit, newPosition);
+                        ecb.SetComponent(squadUnit, adjustedPosition);
                         ecb.SetComponent(squadUnit, new Team { Value = squadSpawnOrder.TeamType});
                         ecb.SetComponent(squadUnit, new URPMaterialPropertyBaseColor { Value = teamColor, });
                     }
@@ -158,19 +157,19 @@ namespace DOTS
 
         //TODO test and fix if needed
         [BurstCompile]
-        private float3 GetSpawnPosition(TeamBattleGrid teamBattleGrid, NativeList<GridNode> squadNodes)
+        private LocalTransform GetSpawnPosition(TeamBattleGrid teamBattleGrid, NativeList<GridNode> squadNodes)
         {
             var startNode = squadNodes[0];
             var offset = teamBattleGrid.OriginShift.Offset;
             
-            // return new LocalTransform
-            // {
-            //     Position = Helpers.GetPosition(new int2(offset.x, offset.y) + new int2(startNode.X, startNode.Y)) + new float3(0.5f, 0, 0.5f),
-            //     Rotation =  quaternion.identity,
-            //     Scale = 1f,
-            // };
+            return new LocalTransform
+            {
+                Position = Helpers.GetPosition(new int2(offset.x, offset.y) + new int2(startNode.X, startNode.Y)) + new float3(0.5f, 0, 0.5f),
+                Rotation =  quaternion.RotateY(teamBattleGrid.OriginShift.Rotation),
+                Scale = 1f,
+            };
 
-            return Helpers.GetPosition(new int2(offset.x, offset.y) + new int2(startNode.X, startNode.Y)) + new float3(0.5f, 0, 0.5f);
+            //return Helpers.GetPosition(new int2(offset.x, offset.y) + new int2(startNode.X, startNode.Y)) + new float3(0.5f, 0, 0.5f);
         }
 
         [BurstCompile]
