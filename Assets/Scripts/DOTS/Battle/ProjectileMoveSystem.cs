@@ -11,8 +11,8 @@ namespace DOTS.Battle
         {
             var deltaTime = SystemAPI.Time.DeltaTime;
 
-            foreach (var (transform, projectileSpeed) 
-                     in SystemAPI.Query<RefRW<LocalTransform>, ProjectileSpeed>().WithAll<Simulate>())
+            foreach (var (transform, projectileSpeed, entity) 
+                     in SystemAPI.Query<RefRW<LocalTransform>, ProjectileSpeed>().WithEntityAccess())
             {
                 transform.ValueRW.Position += transform.ValueRW.Forward() * projectileSpeed.Value * deltaTime;
             }

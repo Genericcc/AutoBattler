@@ -15,11 +15,30 @@ namespace DOTS.Battle
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            foreach (var (localTransform, entity)
-                     in SystemAPI.Query<RefRW<LocalTransform>>().WithAll<DestroyEntityTag>().WithEntityAccess())
+            foreach (var (destroyEntityTag, entity)
+                     in SystemAPI.Query<DestroyEntityTag>().WithEntityAccess())
             {                
-                //localTransform.ValueRW.Position = new float3(1000f, 1000f, 1000f);
                 ecb.DestroyEntity(entity);
+            }
+
+            foreach (var (transform, entity)
+                     in SystemAPI.Query<LocalTransform>().WithNone<DestroyEntityTag, CooldownToDestroy>().WithEntityAccess())
+            {
+                if (transform.Position.y < 0)
+                {
+                    ecb.AddComponent(entity, new CooldownToDestroy { Value = 1f });
+                }
+            }
+
+            foreach (var (cooldownToDestroy, entity)
+                     in SystemAPI.Query<CooldownToDestroy>().WithNone<DestroyEntityTag>().WithEntityAccess())
+            {
+                if (cooldownToDestroy.Value > 0)
+                {
+                    continue;
+                }
+                
+                ecb.AddComponent<DestroyEntityTag>(entity);
             }
         }
     }

@@ -17,6 +17,14 @@ namespace DOTS.Battle
                     currentCooldown.ValueRW.Value -= deltaTime;
                 }
             }
+            
+            foreach (var cooldownToDestroy in SystemAPI.Query<RefRW<CooldownToDestroy>>())
+            {
+                if (cooldownToDestroy.ValueRO.Value > 0)
+                {
+                    cooldownToDestroy.ValueRW.Value -= deltaTime;
+                }
+            }
         }
     }
 }

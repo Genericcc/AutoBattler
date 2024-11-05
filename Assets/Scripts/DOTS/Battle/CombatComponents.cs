@@ -7,6 +7,7 @@ namespace DOTS.Battle
     {
         public int Value;
     }
+    
     public struct CurrentHealth : IComponentData
     {
         public int Value;
@@ -25,11 +26,6 @@ namespace DOTS.Battle
     public struct AttackPrefabs : IComponentData
     {
         public Entity BaseAttackPrefab;
-    }
-
-    public struct DestroyOnTimer : IComponentData
-    {
-        public float Value;
     }
     
     public struct DestroyEntityTag : IComponentData {}
@@ -67,6 +63,11 @@ namespace DOTS.Battle
     }
     
     public struct CurrentCooldown : IComponentData
+    {
+        public float Value;
+    }
+    
+    public struct CooldownToDestroy : IComponentData
     {
         public float Value;
     }
