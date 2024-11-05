@@ -14,6 +14,7 @@ namespace DOTS.Battle
     
     public struct MoveSpeed : IComponentData
     {
-        public float Value;
+        public float MaxSpeed;
+        public float CurrentSpeedModifier;
     }
 }

@@ -1,3 +1,4 @@
+using DOTS.Battle.Curves;
 using DOTS.Rounds;
 using Unity.Burst;
 using Unity.Collections;
@@ -28,17 +29,17 @@ namespace DOTS.Battle
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var deltaTime = SystemAPI.Time.DeltaTime;
             
-            state.Dependency = new UpdateTargetJob
+            state.Dependency = new MoveToTargetJob
             {
-                DeltaTime = deltaTime,
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(),
+                DeltaTime = deltaTime,
                 ECB = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
             }.ScheduleParallel(state.Dependency);
         }
     }
-    
+
     [BurstCompile]
-    public partial struct UpdateTargetJob : IJobEntity
+    public partial struct MoveToTargetJob : IJobEntity
     {
         [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
         [ReadOnly] public float DeltaTime;
@@ -46,24 +47,29 @@ namespace DOTS.Battle
         public EntityCommandBuffer.ParallelWriter ECB;
         
         [BurstCompile]
-        public void Execute(in TargetEntity target, in MoveSpeed moveSpeed, in Entity targeter, [ChunkIndexInQuery] int sortKey)
+        private void Execute(in TargetEntity target, ref MoveSpeed moveSpeed, ref CurveTimer curveTimer,
+            in Entity targeter, [ChunkIndexInQuery] int sortKey)
         {
             if (!TransformLookup.HasComponent(target.Value))
             {
+                moveSpeed.CurrentSpeedModifier = 0f;
+                curveTimer.Reset();
                 return;
             }
 
             var transform = TransformLookup[targeter];
-            
             var currentTargetPosition = TransformLookup[target.Value].Position;
+            
             if (math.distance(currentTargetPosition, transform.Position) <= 3f)
             {
+                moveSpeed.CurrentSpeedModifier = 0f;
+                curveTimer.Reset();
                 return;
             }
             
             currentTargetPosition.y = transform.Position.y;
             var currentDir = math.normalizesafe(currentTargetPosition - transform.Position);
-            transform.Position += currentDir * moveSpeed.Value * DeltaTime;
+            transform.Position += currentDir * moveSpeed.CurrentSpeedModifier * moveSpeed.MaxSpeed * DeltaTime;
             transform.Rotation = quaternion.LookRotationSafe(currentDir, math.up());
             
             ECB.SetComponent(sortKey, targeter, transform);
