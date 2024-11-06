@@ -5,7 +5,7 @@ namespace DOTS.Battle.Curves
 {
     public struct BlobAssetContainerTag : IComponentData {}
     
-    public struct AccelerationCurveReference : IComponentData
+    public struct AccelerationCurveBlobAsset : IComponentData
     {
         public BlobAssetReference<DiscreteCurve> Value;
         public readonly float GetValueAtTime(float time) => Value.Value.GetValueAtTime(time);

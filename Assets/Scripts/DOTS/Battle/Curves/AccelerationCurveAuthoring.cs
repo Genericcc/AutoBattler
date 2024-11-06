@@ -36,7 +36,7 @@ namespace DOTS.Battle.Curves
                 
                 var entity = GetEntity(TransformUsageFlags.None);
                 AddComponent<BlobAssetContainerTag>(entity);
-                AddComponent(entity, new AccelerationCurveReference { Value = blobAssetReference });
+                AddComponent(entity, new AccelerationCurveBlobAsset { Value = blobAssetReference });
             }
         }
     }

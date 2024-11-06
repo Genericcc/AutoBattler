@@ -19,11 +19,11 @@ namespace DOTS.Battle.Curves
             var ecb = new EntityCommandBuffer(Allocator.Temp);
 
             foreach (var (accelerationTimer, entity) in SystemAPI.Query<CurveTimer>()
-                         .WithNone<AccelerationCurveReference>()
+                         .WithNone<AccelerationCurveBlobAsset>()
                          .WithEntityAccess())
             {
-                var accelerationCurveReference = SystemAPI.GetComponent<AccelerationCurveReference>(gameControllerEntity);
-                ecb.AddComponent<AccelerationCurveReference>(entity);
+                var accelerationCurveReference = SystemAPI.GetComponent<AccelerationCurveBlobAsset>(gameControllerEntity);
+                ecb.AddComponent<AccelerationCurveBlobAsset>(entity);
                 ecb.SetComponent(entity, accelerationCurveReference);
             }
             

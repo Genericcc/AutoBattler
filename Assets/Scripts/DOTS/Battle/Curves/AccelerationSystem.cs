@@ -20,7 +20,7 @@ namespace DOTS.Battle.Curves
             var deltaTime = SystemAPI.Time.DeltaTime;
             
             foreach(var (curveTimer, moveSpeed, accelerationCurve) 
-                    in SystemAPI.Query<RefRW<CurveTimer>, RefRW<MoveSpeed>, AccelerationCurveReference>())
+                    in SystemAPI.Query<RefRW<CurveTimer>, RefRW<MoveSpeed>, AccelerationCurveBlobAsset>())
             {
                 if (curveTimer.ValueRO.Value < curveTimer.ValueRO.Max)
                 {

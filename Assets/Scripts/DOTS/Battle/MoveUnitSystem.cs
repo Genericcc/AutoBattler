@@ -36,17 +36,19 @@ namespace DOTS.Battle
             var deltaTime = SystemAPI.Time.DeltaTime;
             
             var hashProperties = SystemAPI.GetSingleton<SpatialHashProperties>();
-            var mousePosition = SystemAPI.GetSingleton<MousePosition>();
+            var mousePosition = SystemAPI.GetSingleton<MousePosition>(); 
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-            var movingEntities = SystemAPI.QueryBuilder().WithAll<MoveSpeed>().Build().CalculateEntityCount();
             
-            var quadrantHashMap = new NativeParallelMultiHashMap<int, Entity>(movingEntities, Allocator.TempJob);
+            var movingEntities = SystemAPI.QueryBuilder().WithAll<MoveSpeed>().Build().CalculateEntityCount();
+            var quadrantHashMap = new NativeParallelMultiHashMap<int, Entity>(movingEntities, Allocator.Temp);
             
             foreach (var (transform, moveSpeed, entity) in SystemAPI.Query<LocalTransform, MoveSpeed>().WithEntityAccess())
             {
                 var hashKey = GetHashKey(transform.Position, hashProperties);
                 quadrantHashMap.Add(hashKey, entity);
             }
+            
+            quadrantHashMap.Dispose();
                 
             DebugDrawQuadrant(mousePosition.Value, hashProperties);
             
@@ -57,7 +59,6 @@ namespace DOTS.Battle
                 ECB = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
             }.ScheduleParallel(state.Dependency);
 
-            quadrantHashMap.Dispose();
         }
 
         private int GetHashKey(float3 position, SpatialHashProperties properties)
@@ -125,17 +126,6 @@ namespace DOTS.Battle
             transform.Rotation = quaternion.LookRotationSafe(currentDir, math.up());
             
             ECB.SetComponent(sortKey, targeter, transform);
-        }
-    }
-
-    public struct HashAndIndex : IComparable<HashAndIndex>
-    {
-        public int Hash;
-        public int Index;
-        
-        public int CompareTo(HashAndIndex other)
-        {
-            return Hash.CompareTo(other.Hash);
         }
     }
 }
