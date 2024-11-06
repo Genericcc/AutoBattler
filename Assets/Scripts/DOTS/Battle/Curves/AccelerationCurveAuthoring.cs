@@ -7,32 +7,36 @@ namespace DOTS.Battle.Curves
     public class AccelerationCurveAuthoring : MonoBehaviour
     {
         public AnimationCurve animationCurve;
-        public int numberOfSamples;
+        public int numberOfSamples; 
         
         private class AccelerationCurveAuthoringBaker : Baker<AccelerationCurveAuthoring>
         {
             public override void Bake(AccelerationCurveAuthoring authoring)
             {
-                var blobBuilder = new BlobBuilder(Allocator.Temp);
-                ref var discreteCurve = ref blobBuilder.ConstructRoot<DiscreteCurve>();
-                var discreteCurveArray = blobBuilder.Allocate(ref discreteCurve.SampledPoints, authoring.numberOfSamples);
-                discreteCurve.NumberOfSamples = authoring.numberOfSamples;
-
-                for (var i = 0; i < authoring.numberOfSamples; i++)
+                BlobAssetReference<DiscreteCurve> blobAssetReference;
+                
+                using (var blobBuilder = new BlobBuilder(Allocator.Temp))
                 {
-                    var samplePoint = (float)i / (authoring.numberOfSamples - 1);
-                    var sampleValue = authoring.animationCurve.Evaluate(samplePoint);
-                    discreteCurveArray[i] = sampleValue;
+                    ref var discreteCurve = ref blobBuilder.ConstructRoot<DiscreteCurve>();
+                    
+                    var discreteCurveArray = blobBuilder.Allocate(ref discreteCurve.SampledPoints, authoring.numberOfSamples);
+                    discreteCurve.NumberOfSamples = authoring.numberOfSamples;
+
+                    for (var i = 0; i < authoring.numberOfSamples; i++)
+                    {
+                        var samplePoint = (float)i / (authoring.numberOfSamples - 1);
+                        var sampleValue = authoring.animationCurve.Evaluate(samplePoint);
+                        discreteCurveArray[i] = sampleValue;
+                    }
+
+                    blobAssetReference = blobBuilder.CreateBlobAssetReference<DiscreteCurve>(Allocator.Persistent);
                 }
-
-                var blobAssetReference = blobBuilder.CreateBlobAssetReference<DiscreteCurve>(Allocator.Persistent);
-                var accelerationCurveReference = new AccelerationCurveReference { Value = blobAssetReference };
-
+                
+                AddBlobAsset(ref blobAssetReference, out var hash);
+                
                 var entity = GetEntity(TransformUsageFlags.None);
                 AddComponent<BlobAssetContainerTag>(entity);
-                AddComponent(entity, accelerationCurveReference);
-                
-                blobBuilder.Dispose();
+                AddComponent(entity, new AccelerationCurveReference { Value = blobAssetReference });
             }
         }
     }

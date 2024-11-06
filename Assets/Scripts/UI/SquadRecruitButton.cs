@@ -34,7 +34,7 @@ namespace UI
         {
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             var entityQuery = entityManager.CreateEntityQuery(typeof(SquadRecruitmentManagerTag));
-            var entities = entityQuery.ToEntityArray(Allocator.TempJob);
+            var entities = entityQuery.ToEntityArray(Allocator.Temp);
 
             foreach (var entity in entities)
             {

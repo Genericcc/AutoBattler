@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using System;
+using Unity.Entities;
 using Unity.Mathematics;
 
 namespace DOTS.Battle
@@ -31,6 +32,17 @@ namespace DOTS.Battle
     public struct TempUnitHashAndIndex : IComponentData
     {
         public HashAndIndex HashAndIndex;
+    }
+
+    public struct HashAndIndex : IComparable<HashAndIndex>
+    {
+        public int Hash;
+        public int Index;
+        
+        public int CompareTo(HashAndIndex other)
+        {
+            return Hash.CompareTo(other.Hash);
+        }
     }
     
     public struct DestroyEntityTag : IComponentData {}

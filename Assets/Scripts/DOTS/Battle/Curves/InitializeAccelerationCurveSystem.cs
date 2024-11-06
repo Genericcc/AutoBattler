@@ -16,7 +16,7 @@ namespace DOTS.Battle.Curves
         public void OnUpdate(ref SystemState state)
         {
             var gameControllerEntity = SystemAPI.GetSingletonEntity<BlobAssetContainerTag>();
-            var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            var ecb = new EntityCommandBuffer(Allocator.Temp);
 
             foreach (var (accelerationTimer, entity) in SystemAPI.Query<CurveTimer>()
                          .WithNone<AccelerationCurveReference>()
