@@ -13,6 +13,12 @@ namespace DOTS.Grid
         public int Height;
     }
 
+    public struct SpatialHashProperties : IComponentData
+    {
+        public float CellSize;
+        public float Multiplier;
+    }
+
     public struct GridSystemData : IComponentData
     {
         public NativeArray<TeamBattleGrid> TeamBattleGrids;

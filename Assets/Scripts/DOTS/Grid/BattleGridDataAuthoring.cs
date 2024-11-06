@@ -9,6 +9,9 @@ namespace DOTS.Grid
     {
         public BattleGridData battleGridData;
         public TeamType[] playingTeams;
+
+        public float hashCellSize;
+        public float hashMultiplier = 19;
         
         private class BattleGridDataAuthoringBaker : Baker<BattleGridDataAuthoring>
         {
@@ -19,6 +22,11 @@ namespace DOTS.Grid
                 {
                     Width = authoring.battleGridData.width,
                     Height = authoring.battleGridData.height,
+                });
+                AddComponent(entity, new SpatialHashProperties
+                {
+                    CellSize = authoring.hashCellSize,
+                    Multiplier = authoring.hashMultiplier,
                 });
                 var buffer = AddBuffer<PlayingTeam>(entity);
                 foreach (var team in authoring.playingTeams)

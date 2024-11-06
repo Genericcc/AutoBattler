@@ -256,9 +256,9 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 84
   m_CollisionDetection: 0
 --- !u!114 &5586545844461376152
 MonoBehaviour:
@@ -285,8 +285,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5a6fd72f78b4b9fb691a1ec677ba3a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 50
-  accelerationTime: 3
+  moveSpeed: 10
+  accelerationTime: 2
 --- !u!114 &-3378420089213915569
 MonoBehaviour:
   m_ObjectHideFlags: 0

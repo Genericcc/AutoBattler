@@ -27,6 +27,11 @@ namespace DOTS.Battle
     {
         public Entity BaseAttackPrefab;
     }
+
+    public struct TempUnitHashAndIndex : IComponentData
+    {
+        public HashAndIndex HashAndIndex;
+    }
     
     public struct DestroyEntityTag : IComponentData {}
 

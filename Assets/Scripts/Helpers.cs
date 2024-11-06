@@ -7,13 +7,5 @@ public static class Helpers
         return x + y * gridSize.x;
     }
     
-    public static float3 GetPosition(int2 gridPosition) => new float3(gridPosition.x, 0, gridPosition.y);
-
-    public static int Hash(int2 gridPosition)
-    {
-        unchecked
-        {
-            return gridPosition.x * 73856093 ^ gridPosition.y * 19349663;
-        }
-    }    
+    public static float3 GetGridPosition(int2 gridPosition) => new (gridPosition.x, 0, gridPosition.y);  
 }

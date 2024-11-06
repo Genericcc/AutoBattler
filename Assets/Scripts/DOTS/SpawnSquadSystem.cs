@@ -164,7 +164,7 @@ namespace DOTS
             
             return new LocalTransform
             {
-                Position = Helpers.GetPosition(new int2(offset.x, offset.y) + new int2(startNode.X, startNode.Y)) + new float3(0.5f, 0, 0.5f),
+                Position = Helpers.GetGridPosition(new int2(offset.x, offset.y) + new int2(startNode.X, startNode.Y)) + new float3(0.5f, 0, 0.5f),
                 Rotation =  quaternion.RotateY(teamBattleGrid.OriginShift.Rotation),
                 Scale = 1f,
             };
