@@ -213,7 +213,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleGridData: {fileID: 11400000, guid: 014f517cc3b652f45b134149b791443e, type: 2}
   playingTeams: 0100000002000000
-  hashCellSize: 2
+  hashCellSize: 5
   hashMultiplier: 19
 --- !u!1 &761237849
 GameObject:

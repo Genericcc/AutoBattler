@@ -7,6 +7,7 @@ using DOTS.Rounds;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
@@ -15,6 +16,8 @@ namespace DOTS.Battle
 {
     public partial struct MoveUnitSystem : ISystem
     {
+        private SpatialHashProperties _hashProperties;
+
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<MousePosition>();
@@ -35,22 +38,23 @@ namespace DOTS.Battle
 
             var deltaTime = SystemAPI.Time.DeltaTime;
             
-            var hashProperties = SystemAPI.GetSingleton<SpatialHashProperties>();
+            _hashProperties = SystemAPI.GetSingleton<SpatialHashProperties>();
             var mousePosition = SystemAPI.GetSingleton<MousePosition>(); 
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             
             var movingEntities = SystemAPI.QueryBuilder().WithAll<MoveSpeed>().Build().CalculateEntityCount();
-            var quadrantHashMap = new NativeParallelMultiHashMap<int, Entity>(movingEntities, Allocator.Temp);
-            
-            foreach (var (transform, moveSpeed, entity) in SystemAPI.Query<LocalTransform, MoveSpeed>().WithEntityAccess())
+            var quadrantHashMap = new NativeParallelMultiHashMap<int, Entity>(movingEntities, Allocator.TempJob);
+
+            state.Dependency = new AssignQuadrantJob
             {
-                var hashKey = GetHashKey(transform.Position, hashProperties);
-                quadrantHashMap.Add(hashKey, entity);
-            }
+                QuadrantHashMap = quadrantHashMap.AsParallelWriter(),
+                SpatialHashProperties = _hashProperties,
+            }.ScheduleParallel(state.Dependency);
             
-            quadrantHashMap.Dispose();
-                
-            DebugDrawQuadrant(mousePosition.Value, hashProperties);
+            state.Dependency.Complete();
+            
+            DebugDrawQuadrant(mousePosition.Value);
+            Debug.Log($"{GetEntityCountInQuadrant(quadrantHashMap, mousePosition.Value)}");
             
             state.Dependency = new MoveToTargetJob
             {
@@ -59,16 +63,36 @@ namespace DOTS.Battle
                 ECB = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
             }.ScheduleParallel(state.Dependency);
 
+            quadrantHashMap.Dispose();
         }
 
-        private int GetHashKey(float3 position, SpatialHashProperties properties)
+        public partial struct AssignQuadrantJob : IJobEntity
+        {
+            [ReadOnly] public SpatialHashProperties SpatialHashProperties;
+            
+            public NativeParallelMultiHashMap<int, Entity>.ParallelWriter QuadrantHashMap;
+            
+            public void Execute(Entity entity, in LocalTransform transform, in MoveSpeed moveSpeed)
+            {
+                var hashKey = GetHashKey(transform.Position, SpatialHashProperties);
+                QuadrantHashMap.Add(hashKey, entity);
+            }
+        }
+
+        private int GetEntityCountInQuadrant(NativeParallelMultiHashMap<int, Entity> quadrantHashMap, float3 mousePositionValue)
+        {
+            var hashKey = GetHashKey(mousePositionValue, _hashProperties);
+            return quadrantHashMap.CountValuesForKey(hashKey);
+        }
+
+        public static int GetHashKey(float3 position, SpatialHashProperties properties)
         {
             return (int)(math.floor(position.x / properties.CellSize) + properties.Multiplier * math.floor(position.z / properties.CellSize));
         }
 
-        private void DebugDrawQuadrant(float3 position, SpatialHashProperties properties)
+        private void DebugDrawQuadrant(float3 position)
         {
-            var cellSize = properties.CellSize;
+            var cellSize = _hashProperties.CellSize;
             var lowerLeft = new float3(math.floor(position.x / cellSize) * cellSize, 0.1f, math.floor(position.z / cellSize) * cellSize);
             Debug.DrawLine(lowerLeft, lowerLeft + new float3(1, 0, 0) * cellSize, Color.magenta);
             Debug.DrawLine(lowerLeft, lowerLeft + new float3(0, 0, 1) * cellSize, Color.magenta);
